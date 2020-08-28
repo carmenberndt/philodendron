@@ -15,7 +15,7 @@ jobs:
         run: |
           echo "VSIX path: ${{ env.vsix_path }}"
       - name: upload as artifact
-        uses: actions/upload-artifact2@v1
+        uses: actions/upload-artifact@v1
         with: 
           name: philodendron-3.1.0.vsix
           path: ${{github.workspace}}/philodendron-3.1.0.vsix
