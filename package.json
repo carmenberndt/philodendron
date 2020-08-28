@@ -2,7 +2,7 @@
 	"name": "philodendron",
 	"displayName": "philodendron",
 	"description": "Test Playground",
-	"version": "2.1.0",
+	"version": "3.1.0",
 	"engines": {
 		"vscode": "^1.47.0"
 	},
@@ -29,7 +29,7 @@
 		"pretest": "npm run compile && npm run lint",
 		"test": "node ./out/test/runTest.js",
 		"package": "vsce package",
-		"deploy": "vsce publish -p",
+		"deploy": "vsce publish -p"
 	},
 	"devDependencies": {
 		"@types/vscode": "^1.47.0",
