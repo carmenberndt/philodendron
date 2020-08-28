@@ -37,4 +37,5 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{github.workspace}}/philodendron-3.2.0.vsix
           asset_name: philodendron-3.2.0.vsix
+          asset-content-type: application/zip
        
