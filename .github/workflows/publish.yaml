@@ -1,0 +1,33 @@
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build extension
+    runs-on: ubuntu-latest
+    steps: 
+      - uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: npm install
+      - name: Create vsix
+        run: npm run package
+      - name: print vsix path
+        run: |
+          echo "VSIX path: ${{ env.vsix_path }}"
+      - name: upload as artifact
+        uses: actions/upload-artifact2@v1
+        with: 
+          name: philodendron-3.1.0.vsix
+          path: ${{github.workspace}}/philodendron-3.1.0.vsix
+      - name: publish to marketplace
+        if: github.ref == 'refs/heads/master'
+        run: npm run deploy ${{ env.PAT }}
+      - name: create a release
+        if: github.ref == 'refs/heads/master'
+        uses: actions/create-release@v1
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v3.1.0
+          release_name: v3.1.0
+       
