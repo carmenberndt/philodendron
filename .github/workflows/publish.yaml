@@ -14,8 +14,8 @@ jobs:
       - name: upload as artifact
         uses: actions/upload-artifact@v1
         with: 
-          name: philodendron-3.2.0.vsix
-          path: ${{github.workspace}}/philodendron-3.2.0.vsix
+          name: philodendron-3.3.0.vsix
+          path: ${{github.workspace}}/philodendron-3.3.0.vsix
       - name: publish to marketplace
         if: github.ref == 'refs/heads/master'
         run: npm run deploy ${{ secrets.PAT }}
@@ -26,8 +26,8 @@ jobs:
         env: 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v3.2.0
-          release_name: v3.2.0
+          tag_name: v3.3.0
+          release_name: v3.3.0
       - name: Upload Release Asset
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
@@ -35,7 +35,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{github.workspace}}/philodendron-3.2.0.vsix
-          asset_name: philodendron-3.2.0.vsix
+          asset_path: ${{github.workspace}}/philodendron-3.3.0.vsix
+          asset_name: philodendron-3.3.0.vsix
           asset-content-type: application/zip
        
