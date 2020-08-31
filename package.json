@@ -29,7 +29,9 @@
 		"pretest": "npm run compile && npm run lint",
 		"test": "node ./out/test/runTest.js",
 		"package": "vsce package",
-		"deploy": "vsce publish -p"
+		"deploy": "vsce publish -p",
+		"check-for-update": "sh scripts/check-for-update.sh",
+		"bump-prisma-version-in-scripts": "sh scripts/bump_prisma_version.sh"
 	},
 	"devDependencies": {
 		"@types/vscode": "^1.47.0",
