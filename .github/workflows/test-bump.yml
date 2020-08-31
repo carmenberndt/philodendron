@@ -18,6 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     steps: 
       - uses: actions/checkout@v2
+      - name: Install Dependency
+        run: npm install
       - name: Setup Git
         run: |
           git config --global user.email "carmen@berndt-home.de"
