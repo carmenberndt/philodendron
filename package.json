@@ -31,7 +31,8 @@
 		"package": "vsce package",
 		"deploy": "vsce publish -p",
 		"check-for-update": "sh scripts/check-for-update.sh",
-		"bump-prisma-version-in-scripts": "sh scripts/bump_prisma_version.sh"
+		"bump-prisma-version-in-scripts": "sh scripts/bump_prisma_version.sh",
+		"bump-extension-version-in-scripts": "node scripts/versions/bump_extension_version.js"
 	},
 	"devDependencies": {
 		"@types/vscode": "^1.47.0",
