@@ -1,4 +1,4 @@
-name: Bump versions on new Prisma CLI
+name: Bump versions
 
 on:
   workflow_dispatch:
