@@ -22,4 +22,4 @@ jobs:
         with:
           workflow: Bump versions
           token: ${{ secrets.GH_TOKEN }}
-          inputs: '{ "npm-channel": "dev", "version": ${{ steps.check_for_update.outputs.dev-version }} }'
+          inputs: '{ "npm-channel": "dev", "version": "${{ steps.check_for_update.outputs.dev-version }}" }'
