@@ -30,9 +30,15 @@
 		"test": "node ./out/test/runTest.js",
 		"package": "vsce package",
 		"deploy": "vsce publish -p",
-		"check-for-update": "sh scripts/check-for-update.sh",
-		"bump-prisma-version-in-scripts": "sh scripts/bump_prisma_version.sh",
-		"bump-extension-version-in-scripts": "node scripts/versions/bump_extension_version.js"
+		"openvsx:publish": "cd packages/vscode && ovsx publish -p",
+		"check-for-update": "sh scripts/versions/check-for-update.sh",
+		"bump-prisma-version-in-scripts": "sh scripts/versions/bump_prisma_version.sh",
+		"bump-extension-version-in-scripts": "node scripts/versions/bump_extension_version.js",
+		"setup:branch": "node scripts/versions/setup_branch.js",
+		"change-readme": "sh scripts/change-readme.js",
+		"bump-versions-in-repo": "sh scripts/update-versions.sh",
+		"get-next-lsp-version": "node scripts/next-lsp-version.js",
+		"get-tag-name": "sh scripts/get-tag-name.sh"
 	},
 	"devDependencies": {
 		"@types/vscode": "^1.47.0",

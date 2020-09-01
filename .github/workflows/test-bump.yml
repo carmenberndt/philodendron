@@ -18,12 +18,12 @@ jobs:
     runs-on: ubuntu-latest
     steps: 
       - uses: actions/checkout@v2
-      - name: Install Dependency
+      - name: Install Semver # Needed to use semver in scripts
         run: npm install
       - name: Setup Git
         run: |
           git config --global user.email "carmen@berndt-home.de"
-          git config --global user.name "Carmen"
+          git config --global user.name "Bot"
           git remote add github "https://$GITHUB_ACTOR:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git" || true
       - name: Update versions in scripts folder 
         run: npm run bump-prisma-version-in-scripts ${{ github.event.inputs.npm-channel }} ${{ github.event.inputs.version }}
@@ -33,7 +33,17 @@ jobs:
       - name: Push to master
         run: |
           git add -A .
-          git commit -m "bump Prisma CLI ${{ github.event.inputs.npm-channel }} version to ${{ github.event.inputs.version }} and extension version to ${{ steps.update.next-vscode-version }}."
+          git commit -m "bump test CLI ${{ github.event.inputs.npm-channel }} version to ${{ github.event.inputs.version }} and extension version to ${{ steps.update.next-vscode-version }} in scripts."
           git push
+      - name: Switch branch 
+        if: ${{ github.event.inputs.npm-channel }} != "dev"
+        run: npm run setup:branch ${{ github.event.inputs.npm-channel }}
+      - name: Trigger next workflow to build extension
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: Build extension
+          token: ${{ secrets.GH_TOKEN }}
+          inputs: '{ "npm-channel": "${{ github.event.inputs.npm-channel }}", "vscode-version": "${{ github.event.inputs.vscode-version }}" }'
+
 
 
