@@ -16,6 +16,6 @@ if [ "$NEW_PRISMA_VERSION" != "" ]; then
     SHA=$(npx -q @prisma/cli@"$NEW_PRISMA_VERSION" version --json | grep "format-binary" | awk '{print $3}')
     jq ".prisma.version = \"$SHA\" | \
     .dependencies[\"@prisma/get-platform\"] = \"$NEW_PRISMA_VERSION\"" \
-    ./packages/language-server/package.json >./packages/language-server/package.json.bk
+    ./src/package.json >./src/package.json.bk
 fi
 
