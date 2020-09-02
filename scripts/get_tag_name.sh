@@ -12,6 +12,6 @@ if [ "$RELEASE_CHANNEL" = "latest" ]; then
     echo "::set-output name=tag_name::$VSCODE_VERSION"
     echo "::set-output name=asset_name::philodendron"
 else
-    echo "::set-output name=tag_name::insider/$VSCODE_VERSION"
+    echo "::set-output name=tag_name::$VSCODE_VERSION"
     echo "::set-output name=asset_name::philodendron"
 fi
