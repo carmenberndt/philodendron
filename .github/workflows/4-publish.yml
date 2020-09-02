@@ -13,7 +13,6 @@ on:
 
 jobs:
   marketplace:
-    needs: [pre]
     name: Publish to marketplace
     runs-on: ubuntu-latest
     steps: 
