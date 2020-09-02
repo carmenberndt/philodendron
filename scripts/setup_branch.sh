@@ -11,12 +11,12 @@ else
     echo "No .envrc"
 fi
 
-BRANCH_CHANNEL=$1
+NPM_CHANNEL=$1
 
-
-BRANCH=$(node scripts/versions/setup-branch.js "$BRANCH_CHANNEL")
+BRANCH=$(node scripts/setup_branch.js "$NPM_CHANNEL")
 echo "BRANCH: $BRANCH"
 
+git fetch
 
 EXISTS_ALREADY=$(git ls-remote --heads origin "$BRANCH")
 echo "$EXISTS_ALREADY"
@@ -25,14 +25,14 @@ if [ "${EXISTS_ALREADY}" = "" ]; then
     echo "Branch $BRANCH does not exist yet."
 
     if [ "$ENVIRONMENT" = "PRODUCTION" ]; then
-        NPM_LATEST=$(cat scripts/versions/prisma_latest)
-        git checkout -b "$BRANCH" "$NPM_LATEST"
-        echo "Checked branch out to $BRANCH."       
+        $NPM_VERSION=$(cat scripts/versions/prisma_latest)
+        git config --global user.email "prismabots@gmail.com"
+        git config --global user.name "Prismo"
+        git checkout -b "$BRANCH" "$NPM_VERSION"
     else
         echo "Not setting up repo because ENVIRONMENT is not set"
     fi
 else 
     git checkout "$BRANCH"
-    echo "Branch $BRANCH exists already."
-    echo "Checked branch out to $BRANCH."
+    echo "$BRANCH exists already."
 fi

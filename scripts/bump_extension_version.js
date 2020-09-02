@@ -102,16 +102,10 @@ function readFile({
 function bumpExtensionVersionInScriptFiles({
   nextVersion = '',
   branch_channel = '',
-  extensionBump = true
 }) {
   let insiderName = "extension_insider"
   let stableName = "extension_stable"
   let patchName = "extension_patch"
-  if (!extensionBump) {
-    insiderName = "lsp-dev"
-    stableName = "lsp-latest"
-    patchName = "lsp-patch-dev"
-  }
   switch (branch_channel) {
     case 'master':
     case 'dev':
@@ -144,7 +138,7 @@ if (require.main === module) {
     branch_channel: args[0],
   })
   console.log(`Next extension version ${version}.`)
-  console.log(`::set-output name=next-vscode-version::${version}`)
+  console.log(`::set-output name=next_extension_version::${version}`)
   bumpExtensionVersionInScriptFiles({
     nextVersion: version,
     branch_channel: args[0],
