@@ -34,6 +34,7 @@
 		"check_for_update": "sh scripts/check_for_update.sh",
 		"bump_prisma_version_in_scripts": "sh scripts/bump_prisma_version.sh",
 		"bump_extension_version_in_scripts": "node scripts/bump_extension_version.js",
+		"bump_versions_in_repo": "sh scripts/update_versions.sh",
 		"setup:branch": "node scripts/setup_branch.js",
 		"get_tag_name": "sh scripts/get_tag_name.sh"
 	},
