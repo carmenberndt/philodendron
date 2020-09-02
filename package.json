@@ -31,11 +31,11 @@
 		"package": "vsce package",
 		"deploy": "vsce publish -p",
 		"openvsx:publish": "cd packages/vscode && ovsx publish -p",
-		"check-for-update": "sh scripts/check_for_update.sh",
-		"bump-prisma-version-in-scripts": "sh scripts/bump_prisma_version.sh",
-		"bump-extension-version-in-scripts": "node scripts/bump_extension_version.js",
+		"check_for_update": "sh scripts/check_for_update.sh",
+		"bump_prisma_version_in_scripts": "sh scripts/bump_prisma_version.sh",
+		"bump_extension_version_in_scripts": "node scripts/bump_extension_version.js",
 		"setup:branch": "node scripts/setup_branch.js",
-		"get-tag-name": "sh scripts/get_tag_name.sh"
+		"get_tag_name": "sh scripts/get_tag_name.sh"
 	},
 	"devDependencies": {
 		"@types/vscode": "^1.47.0",
