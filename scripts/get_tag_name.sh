@@ -10,8 +10,8 @@ echo "VSCODE_VERSION: $VSCODE_VERSION"
 
 if [ "$RELEASE_CHANNEL" = "latest" ]; then 
     echo "::set-output name=tag_name::$VSCODE_VERSION"
-    echo "::set-output name=asset_name::prisma"
+    echo "::set-output name=asset_name::philodendron"
 else
     echo "::set-output name=tag_name::insider/$VSCODE_VERSION"
-    echo "::set-output name=asset_name::prisma-insider"
+    echo "::set-output name=asset_name::philodendron-insider"
 fi
