@@ -19,3 +19,17 @@ if [ "$NEW_PRISMA_VERSION" != "" ]; then
     ./src/package.json >./src/package.json.bk
 fi
 
+mv ./src/package.json.bk ./src/package.json
+
+# If the RELEASE_CHANNEL is dev, we need to change the name, displayName, description and preview flag to the Insider extension
+if [ "$RELEASE_CHANNEL" = "dev" ] || [ "$RELEASE_CHANNEL" = "patch-dev" ]; then
+    jq ".version = \"$NEW_EXTENSION_VERSION\" | \
+        .preview = true" \
+    ./package.json >./package.json.bk
+else
+    jq ".version = \"$NEW_EXTENSION_VERSION\" | \
+        .preview = false" \
+    ./package.json >./package.json.bk
+fi
+
+mv ./package.json.bk ./package.json
