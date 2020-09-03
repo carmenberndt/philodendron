@@ -2,10 +2,12 @@ const fs = require('fs')
 const path = require('path')
 const semVer = require('semver')
 
-function isMinorRelease(
+function isMinorRelease({
   prismaVersion,
-) {
+}) {
   const tokens = prismaVersion.split('.')
+  console.log(tokens)
+
   if (tokens.length !== 3) {
     throw new Error(
       `Version ${prismaVersion} must have 3 tokens separated by "." character.`
@@ -82,7 +84,7 @@ function nextVersion({
       return semVer.inc(currentVersion, 'patch')
     case 'latest':
       // Prisma CLI new latest version
-      if (isMinorRelease( prisma_latest)) {
+      if (isMinorRelease({prismaVersion: prisma_latest})) {
         return prisma_latest
       }
       return semVer.inc(prisma_latest, 'patch')
