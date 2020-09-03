@@ -39,6 +39,7 @@ jobs:
         run: |
           git add -A .
           git commit -m "bump Prisma CLI ${{ github.event.inputs.npm_channel }} version to ${{ github.event.inputs.version }} and extension version to ${{ steps.update.outputs.next_extension_version }} in scripts."
+          git pull --rebase
           git push
       - name: Switch branch 
         id: setup_branch
@@ -49,6 +50,7 @@ jobs:
         run: |
           git add -A .
           git commit -m "bump extension version to ${{ steps.update.outputs.next_extension_version }} in package.json"
+          git pull --rebase
           git push ${{ steps.setup_branch.outputs.new_branch}}
       - name: Build extension
         uses: benc-uk/workflow-dispatch@v1
