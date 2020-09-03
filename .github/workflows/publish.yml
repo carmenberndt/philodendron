@@ -9,13 +9,6 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install Dependencies
         run: npm install
-      - name: Create vsix
-        run: npm run package
-      - name: upload as artifact
-        uses: actions/upload-artifact@v1
-        with: 
-          name: philodendron-3.4.0.vsix
-          path: ${{github.workspace}}/philodendron-3.4.0.vsix
       - name: publish to marketplace
         if: github.ref == 'refs/heads/master'
         run: npm run deploy --pat ${{ secrets.PAT}} --packagePath ./extensions/philodendron-7.0.8.vsix
