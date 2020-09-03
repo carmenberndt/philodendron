@@ -11,6 +11,6 @@ jobs:
         run: npm install
       - name: publish to marketplace
         if: github.ref == 'refs/heads/master'
-        run: ./node_modules/.bin/vsce -p ${{ secrets.PAT}} --packagePath ./extensions/philodendron-7.0.8.vsix
+        run: ./node_modules/.bin/vsce publish -p ${{ secrets.PAT}} --packagePath ./extensions/philodendron-7.0.8.vsix
 
        
