@@ -2,7 +2,7 @@
   "name": "philodendron",
   "displayName": "philodendron",
   "description": "Test Playground",
-  "version": "2.5.0",
+  "version": "7.0.11",
   "engines": {
     "vscode": "^1.47.0"
   },
@@ -60,5 +60,5 @@
     "type": "github",
     "url": "https://github.com/carmenberndt/philodendron"
   },
-  "preview": false
+  "preview": true
 }
