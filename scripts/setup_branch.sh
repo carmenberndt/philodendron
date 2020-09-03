@@ -28,7 +28,7 @@ if [ "${EXISTS_ALREADY}" = "" ]; then
         git config --global user.email "carmen@berndt-home.de"
         git config --global user.name "Bot"
 
-        if [ "$NPM_CHANNEL" = "latest"]; then
+        if [ "$NPM_CHANNEL" = "latest" ]; then
             git checkout -b "$BRANCH"
         else
             # Patch branch
