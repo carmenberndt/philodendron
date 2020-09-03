@@ -36,15 +36,16 @@ jobs:
           git commit -m "bump Prisma CLI ${{ github.event.inputs.npm_channel }} version to ${{ github.event.inputs.version }} and extension version to ${{ steps.update.outputs.next_extension_version }} in scripts."
           git push
       - name: Switch branch 
+        id: setup_branch
         if: ${{ github.event.inputs.npm_channel }} != "dev"
         run: npm run setup:branch ${{ github.event.inputs.npm_channel }}
       - name: Update Prisma CLI version and VSCode extension version
         run:  npm run bump_versions_in_repo ${{ github.event.inputs.npm_channel }} ${{ steps.update.outputs.next_extension_version }} ${{ github.event.inputs.version }}
-      - name: Push to branch
+      - name: Push to existing branch
         run: |
           git add -A .
           git commit -m "bump extension version to ${{ steps.update.outputs.next_extension_version }} in package.json"
-          git push
+          git push ${{ steps.setup_branch.outputs.new_branch}}
       - name: Build extension
         uses: benc-uk/workflow-dispatch@v1
         with:
