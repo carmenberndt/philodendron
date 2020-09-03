@@ -29,7 +29,7 @@
     "pretest": "npm run compile && npm run lint",
     "test": "node ./out/test/runTest.js",
     "package": "vsce package",
-    "deploy": "vsce publish -p",
+    "deploy": "vsce publish",
     "openvsx:publish": "cd packages/vscode && ovsx publish -p",
     "check_for_update": "sh scripts/check_for_update.sh",
     "bump_prisma_version_in_scripts": "sh scripts/bump_prisma_version.sh",
