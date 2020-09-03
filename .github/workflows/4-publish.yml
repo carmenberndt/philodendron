@@ -26,4 +26,4 @@ jobs:
           file: ${{ github.event.inputs.asset_name }}
           token: ${{ secrets.GH_TOKEN }}
       - name: publish vsix to marketplace
-        run: npm run deploy --pat ${{ secrets.PAT}} --packagePath ${{github.workspace}}/${{ github.event.inputs.asset_name }}
+        run: ./node_modules/.bin/vsce publish -p ${{ secrets.PAT}} --packagePath ${{github.workspace}}/${{ github.event.inputs.asset_name }}
