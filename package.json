@@ -2,7 +2,7 @@
   "name": "philodendron",
   "displayName": "philodendron",
   "description": "Test Playground",
-  "version": "7.0.19",
+  "version": "7.0.20",
   "engines": {
     "vscode": "^1.47.0"
   },
