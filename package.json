@@ -50,5 +50,21 @@
   "repository": {
     "type": "github",
     "url": "https://github.com/carmenberndt/philodendron"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "lint-staged": {
+    "packages/**/*.{js,ts,css,json,md}": [
+      "prettier --write"
+    ],
+    "packages/**/*.{js,ts}": [
+      "eslint --fix"
+    ]
   }
 }
