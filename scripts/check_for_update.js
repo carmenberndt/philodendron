@@ -1,7 +1,8 @@
 const {readVersionFile, getNpmPrismaVersion } = require('./util')
 
 function checkForUpdate({channel}) {
-    const currentPrismaVersion = readVersionFile(`prisma_${channel}`)
+    const currentPrismaVersion = readVersionFile({fileName: `prisma_${channel}`})
+    console.log(currentPrismaVersion)
     const npmPrismaVersion = getNpmPrismaVersion({channel: channel})
 
     if (currentPrismaVersion != npmPrismaVersion) {
