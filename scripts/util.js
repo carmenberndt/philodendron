@@ -1,4 +1,5 @@
 const execa = require('execa')
+const fs = require('fs')
 
 function writeToVersionFile({
     fileName = '',
