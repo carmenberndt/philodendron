@@ -16,7 +16,6 @@ function bumpLSPVersionInExtension({version}) {
   const vscodePackageJsonPath = path.join(__dirname, '../packages/vscode/package.json')
   let content = getPackageJsonContent({path: vscodePackageJsonPath})
   content['dependencies']['test-philodendron-language-server'] = version
-  console.log(content)
   writeJsonToPackageJson({content: content, path: vscodePackageJsonPath})
 }
 
