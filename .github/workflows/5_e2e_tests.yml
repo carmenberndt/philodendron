@@ -31,10 +31,6 @@ jobs:
         run: npm install
       - name: Compile
         run: npm run compile
-      - name: Headless e2e tests
-        uses: GabrielBB/xvfb-action@v1.0
-        with:
-          run: npm run test
   
   trigger:
     name: Trigger next workflow
