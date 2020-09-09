@@ -1,26 +1,27 @@
-const fs = require('fs')
 const execa = require('execa')
+const path = require('path')
+const {writeJsonToPackageJson, getPackageJsonContent } = require('./util')
 
 function bumpVersionInVSCodeRepo({ version, name, displayName, preview }) {
-  const vscodePackageJsonPath = './packages/vscode/package.json'
-  let content = fs.readFileSync(vscodePackageJsonPath, { encoding: "utf-8" })
+  const vscodePackageJsonPath = path.join(__dirname, '../packages/vscode/package.json')
+  let content = getPackageJsonContent({path: vscodePackageJsonPath})
   content['version'] = version
   content['name'] = name
   content['displayName'] = displayName
   content['preview'] = preview
-  fs.writeFileSync(vscodePackageJsonPath, content)
+  writeJsonToPackageJson({content: content, path: vscodePackageJsonPath})
 }
 
 function bumpLSPVersionInExtension({version}) {
-  const vscodePackageJsonPath = './packages/vscode/package.json'
-  let content = fs.readFileSync(vscodePackageJsonPath, { encoding: "utf-8" })
+  const vscodePackageJsonPath = path.join(__dirname, '../packages/vscode/package.json')
+  let content = getPackageJsonContent({path: vscodePackageJsonPath})
   content['dependencies']['test-philodendron-language-server'] = version
-  fs.writeFileSync(vscodePackageJsonPath, content)
+  writeJsonToPackageJson({content: content, path: vscodePackageJsonPath})
 }
 
 function bumpVersionsInRepo({ channel, newExtensionVersion, newPrismaVersion = '' }) {
-  const languageServerPackageJsonPath = './packages/vscode/package.json'
-  const rootPackageJsonPath = './package.json'
+  const languageServerPackageJsonPath = path.join(__dirname, '../packages/vscode/package.json')
+  const rootPackageJsonPath = path.join(__dirname, '../package.json')
 
   // update version in packages/vscode folder
   if (channel === 'dev' || channel === 'patch-dev') {
@@ -46,19 +47,17 @@ function bumpVersionsInRepo({ channel, newExtensionVersion, newPrismaVersion = '
       const { stdout } = await execa('npx', ['-q', `@prisma/cli@2.6.0`, 'version', '--json']);
       let json = JSON.parse(stdout)
       let sha = json["format-binary"].split(/\s+/).slice(1)[0]
-      let languageServerPackageJson = fs.readFileSync(
-        languageServerPackageJsonPath, { encoding: "utf-8" }
-      );
+      let languageServerPackageJson = getPackageJsonContent({path: languageServerPackageJsonPath})
       languageServerPackageJson['prisma']['version'] = sha
       languageServerPackageJson['dependencies']['@prisma/get-platform'] = newPrismaVersion
-      fs.writeFileSync(languageServerPackageJsonPath, languageServerPackageJson)
+      writeJsonToPackageJson({content: languageServerPackageJson, path: languageServerPackageJsonPath})
     })();
   }
 
   // update version in root package.json 
-  let rootPackageJson = fs.readFileSync(rootPackageJsonPath, { encoding: "utf-8" })
+  let rootPackageJson = getPackageJsonContent({path: rootPackageJsonPath})
   rootPackageJson['version'] = newExtensionVersion
-  fs.writeFileSync(rootPackageJsonPath, rootPackageJson)
+  writeJsonToPackageJson({content: rootPackageJson, path: rootPackageJsonPath})
 }
 
 module.exports = { bumpVersionsInRepo }
@@ -66,18 +65,21 @@ module.exports = { bumpVersionsInRepo }
 if (require.main === module) {
   const args = process.argv.slice(2)
   if (args.length === 3) {
+    console.log("Bumping Prisma CLI version and extension version in repo.")
     bumpVersionsInRepo({
       channel: args[0],
       newExtensionVersion: args[1],
       newPrismaVersion: args[2]
     })
   } else if (args.length === 2) {
+    console.log("Bumping extension version in repo.")
     bumpVersionsInRepo({
       channel: args[0],
       newExtensionVersion: args[1]
     })
   } else if (args.length === 1) {
     // only bump LSP version in extension
+    console.log("Bumping LSP version in extension.")
     bumpLSPVersionInExtension({
       nextLSPVersion: args[0]
     })
