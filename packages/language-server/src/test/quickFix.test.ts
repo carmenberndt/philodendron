@@ -1,5 +1,5 @@
-import { TextDocument } from 'vscode-languageserver-textdocument'
-import { quickFix } from '../codeActionProvider'
+import { TextDocument } from "vscode-languageserver-textdocument";
+import { quickFix } from "../codeActionProvider";
 import {
   CodeAction,
   DiagnosticSeverity,
@@ -7,17 +7,17 @@ import {
   CodeActionKind,
   Range,
   Diagnostic,
-} from 'vscode-languageserver'
-import * as assert from 'assert'
-import { getTextDocument } from './helper'
+} from "vscode-languageserver";
+import * as assert from "assert";
+import { getTextDocument } from "./helper";
 
 function assertQuickFix(
   expected: CodeAction[],
   fixturePath: string,
   range: Range,
-  diagnostics: Diagnostic[],
+  diagnostics: Diagnostic[]
 ): void {
-  const document: TextDocument = getTextDocument(fixturePath)
+  const document: TextDocument = getTextDocument(fixturePath);
 
   const params: CodeActionParams = {
     textDocument: document,
@@ -25,17 +25,17 @@ function assertQuickFix(
       diagnostics: diagnostics,
     },
     range: range,
-  }
+  };
 
-  const quickFixResult: CodeAction[] = quickFix(document, params)
+  const quickFixResult: CodeAction[] = quickFix(document, params);
 
-  assert.ok(quickFixResult.length !== 0)
-  assert.deepEqual(quickFixResult, expected)
+  assert.ok(quickFixResult.length !== 0);
+  assert.deepEqual(quickFixResult, expected);
 }
 
 function createDiagnosticErrorUnknownType(
   unknownType: string,
-  range: Range,
+  range: Range
 ): Diagnostic {
   return {
     message:
@@ -44,40 +44,40 @@ function createDiagnosticErrorUnknownType(
       '" is neither a built-in type, nor refers to another model, custom type, or enum.',
     severity: DiagnosticSeverity.Error,
     range: range,
-  }
+  };
 }
 
-suite('Quick Fix', () => {
-  const fixturePath = './codeActions/quickFixes.prisma'
+suite("Quick Fix", () => {
+  const fixturePath = "./codeActions/quickFixes.prisma";
 
   const rangeNewModel: Range = {
     start: { line: 16, character: 9 },
     end: { line: 16, character: 17 },
-  }
+  };
   const rangeNewEnum: Range = {
     start: { line: 24, character: 6 },
     end: { line: 24, character: 13 },
-  }
+  };
   const rangePorst: Range = {
     start: { line: 31, character: 15 },
     end: { line: 31, character: 9 },
-  }
+  };
   const rangeEdit: Range = {
     start: { line: 35, character: 0 },
     end: { line: 35, character: 0 },
-  }
+  };
 
   const diagnosticsNewModel: Diagnostic[] = [
-    createDiagnosticErrorUnknownType('NewModel', rangeNewModel),
-  ]
+    createDiagnosticErrorUnknownType("NewModel", rangeNewModel),
+  ];
   const diagnosticsNewEnum: Diagnostic[] = [
-    createDiagnosticErrorUnknownType('NewEnum', rangeNewEnum),
-  ]
+    createDiagnosticErrorUnknownType("NewEnum", rangeNewEnum),
+  ];
   const diagnosticsPorst: Diagnostic[] = [
-    createDiagnosticErrorUnknownType('Porst', rangePorst),
-  ]
+    createDiagnosticErrorUnknownType("Porst", rangePorst),
+  ];
 
-  test('Model/enum creations', () => {
+  test("Model/enum creations", () => {
     assertQuickFix(
       [
         {
@@ -89,7 +89,7 @@ suite('Quick Fix', () => {
               [fixturePath]: [
                 {
                   range: rangeEdit,
-                  newText: '\nmodel NewModel {\n\n}\n',
+                  newText: "\nmodel NewModel {\n\n}\n",
                 },
               ],
             },
@@ -104,7 +104,7 @@ suite('Quick Fix', () => {
               [fixturePath]: [
                 {
                   range: rangeEdit,
-                  newText: '\nenum NewModel {\n\n}\n',
+                  newText: "\nenum NewModel {\n\n}\n",
                 },
               ],
             },
@@ -113,7 +113,7 @@ suite('Quick Fix', () => {
       ],
       fixturePath,
       rangeNewModel,
-      diagnosticsNewModel,
+      diagnosticsNewModel
     ),
       assertQuickFix(
         [
@@ -126,7 +126,7 @@ suite('Quick Fix', () => {
                 [fixturePath]: [
                   {
                     range: rangeEdit,
-                    newText: '\nmodel NewEnum {\n\n}\n',
+                    newText: "\nmodel NewEnum {\n\n}\n",
                   },
                 ],
               },
@@ -141,7 +141,7 @@ suite('Quick Fix', () => {
                 [fixturePath]: [
                   {
                     range: rangeEdit,
-                    newText: '\nenum NewEnum {\n\n}\n',
+                    newText: "\nenum NewEnum {\n\n}\n",
                   },
                 ],
               },
@@ -150,10 +150,10 @@ suite('Quick Fix', () => {
         ],
         fixturePath,
         rangeNewEnum,
-        diagnosticsNewEnum,
-      )
-  })
-  test('Spelling suggestions and model/enum creations', () => {
+        diagnosticsNewEnum
+      );
+  });
+  test("Spelling suggestions and model/enum creations", () => {
     assertQuickFix(
       [
         {
@@ -165,7 +165,7 @@ suite('Quick Fix', () => {
               [fixturePath]: [
                 {
                   range: rangePorst,
-                  newText: 'Post?',
+                  newText: "Post?",
                 },
               ],
             },
@@ -180,7 +180,7 @@ suite('Quick Fix', () => {
               [fixturePath]: [
                 {
                   range: rangeEdit,
-                  newText: '\nmodel Porst {\n\n}\n',
+                  newText: "\nmodel Porst {\n\n}\n",
                 },
               ],
             },
@@ -195,7 +195,7 @@ suite('Quick Fix', () => {
               [fixturePath]: [
                 {
                   range: rangeEdit,
-                  newText: '\nenum Porst {\n\n}\n',
+                  newText: "\nenum Porst {\n\n}\n",
                 },
               ],
             },
@@ -204,7 +204,7 @@ suite('Quick Fix', () => {
       ],
       fixturePath,
       rangePorst,
-      diagnosticsPorst,
-    )
-  })
-})
+      diagnosticsPorst
+    );
+  });
+});

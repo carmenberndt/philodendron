@@ -1,35 +1,35 @@
-import { spawn } from 'child_process'
+import { spawn } from "child_process";
 
 export default function exec(
   execPath: string,
   args: string[],
-  input: string,
+  input: string
 ): Promise<string> {
-  const fmt = spawn(execPath, args)
+  const fmt = spawn(execPath, args);
 
-  const chunks: string[] = []
+  const chunks: string[] = [];
 
-  fmt.stdout.on('data', (data) => {
-    chunks.push(data.toString())
-  })
+  fmt.stdout.on("data", (data) => {
+    chunks.push(data.toString());
+  });
 
-  const errChunks: string[] = []
+  const errChunks: string[] = [];
 
-  fmt.stderr.on('data', (data) => {
-    errChunks.push(data.toString())
-  })
+  fmt.stderr.on("data", (data) => {
+    errChunks.push(data.toString());
+  });
 
-  fmt.stdin.setDefaultEncoding('utf-8')
-  fmt.stdin.write(input)
-  fmt.stdin.end()
+  fmt.stdin.setDefaultEncoding("utf-8");
+  fmt.stdin.write(input);
+  fmt.stdin.end();
 
   return new Promise((resolve, reject) => {
-    fmt.on('exit', (code) => {
+    fmt.on("exit", (code) => {
       if (code === 0 && errChunks.length === 0) {
-        resolve(chunks.join(''))
+        resolve(chunks.join(""));
       } else {
-        reject(errChunks.join(''))
+        reject(errChunks.join(""));
       }
-    })
-  })
+    });
+  });
 }

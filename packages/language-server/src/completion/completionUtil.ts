@@ -2,21 +2,21 @@ import {
   CompletionItem,
   CompletionItemKind,
   MarkupKind,
-} from 'vscode-languageserver'
-import * as completions from './completions.json'
+} from "vscode-languageserver";
+import * as completions from "./completions.json";
 
 /**
  * Converts a json object containing labels and documentations to CompletionItems.
  */
 function convertToCompletionItems(
   completionItems: {
-    label: string
-    documentation?: string
+    label: string;
+    documentation?: string;
   }[],
   itemKind: CompletionItemKind,
-  insertTextFunc?: (label: string) => string,
+  insertTextFunc?: (label: string) => string
 ): CompletionItem[] {
-  const result: CompletionItem[] = []
+  const result: CompletionItem[] = [];
   for (const item of completionItems) {
     result.push({
       label: item.label,
@@ -26,9 +26,9 @@ function convertToCompletionItems(
       documentation: item.documentation
         ? { kind: MarkupKind.Markdown, value: item.documentation }
         : undefined,
-    })
+    });
   }
-  return result
+  return result;
 }
 
 /**
@@ -36,25 +36,28 @@ function convertToCompletionItems(
  */
 function convertAttributesToCompletionItems(
   completionItems: {
-    label: string
-    documentation: string
-    fullSignature: string
-    params: { label: string; documentation: string }[]
+    label: string;
+    documentation: string;
+    fullSignature: string;
+    params: { label: string; documentation: string }[];
   }[],
   itemKind: CompletionItemKind,
-  insertTextFunc: (label: string) => string,
+  insertTextFunc: (label: string) => string
 ): CompletionItem[] {
-  const result: CompletionItem[] = []
+  const result: CompletionItem[] = [];
   for (const item of completionItems) {
     const docComment = [
-      '```prisma',
+      "```prisma",
       item.fullSignature,
-      '```',
-      '___',
+      "```",
+      "___",
       item.documentation,
-    ]
+    ];
     for (const param of item.params) {
-      docComment.push('', '_@param_ ' + param.label + ' ' + param.documentation)
+      docComment.push(
+        "",
+        "_@param_ " + param.label + " " + param.documentation
+      );
     }
     result.push({
       label: item.label,
@@ -63,91 +66,91 @@ function convertAttributesToCompletionItems(
       insertTextFormat: 2,
       documentation: {
         kind: MarkupKind.Markdown,
-        value: docComment.join('\n'),
+        value: docComment.join("\n"),
       },
-    })
+    });
   }
-  return result
+  return result;
 }
 
 export const corePrimitiveTypes: CompletionItem[] = convertToCompletionItems(
   completions.primitiveTypes,
-  CompletionItemKind.TypeParameter,
-)
+  CompletionItemKind.TypeParameter
+);
 
 export const allowedBlockTypes: CompletionItem[] = convertToCompletionItems(
   completions.blockTypes,
-  CompletionItemKind.Class,
-)
+  CompletionItemKind.Class
+);
 
 export const supportedDataSourceFields: CompletionItem[] = convertToCompletionItems(
   completions.dataSourceFields,
-  CompletionItemKind.Field,
-)
+  CompletionItemKind.Field
+);
 
 export const supportedGeneratorFields: CompletionItem[] = convertToCompletionItems(
   completions.generatorFields,
-  CompletionItemKind.Field,
-)
+  CompletionItemKind.Field
+);
 
 export const blockAttributes: CompletionItem[] = convertAttributesToCompletionItems(
   completions.blockAttributes,
   CompletionItemKind.Property,
-  (label: string) => label.replace('[]', '[$0]').replace('""', '"$0"'),
-)
+  (label: string) => label.replace("[]", "[$0]").replace('""', '"$0"')
+);
 
 export const fieldAttributes: CompletionItem[] = convertAttributesToCompletionItems(
   completions.fieldAttributes,
   CompletionItemKind.Property,
-  (label: string) => label.replace('()', '($0)').replace('""', '"$0"'),
-)
+  (label: string) => label.replace("()", "($0)").replace('""', '"$0"')
+);
 
 export const relationArguments: CompletionItem[] = convertAttributesToCompletionItems(
   completions.relationArguments,
   CompletionItemKind.Property,
-  (label: string) => label.replace('[]', '[$0]').replace('""', '"$0"'),
-)
+  (label: string) => label.replace("[]", "[$0]").replace('""', '"$0"')
+);
 
 export const dataSourceUrlArguments: CompletionItem[] = convertAttributesToCompletionItems(
   completions.datasourceUrlArguments,
   CompletionItemKind.Property,
-  (label: string) => label.replace('()', '($0)').replace('""', '"$0"'),
-)
+  (label: string) => label.replace("()", "($0)").replace('""', '"$0"')
+);
 
 export const dataSourceProviders: CompletionItem[] = convertToCompletionItems(
   completions.datasourceProviders,
-  CompletionItemKind.Constant,
-)
+  CompletionItemKind.Constant
+);
 
 export const dataSourceProviderArguments: CompletionItem[] = convertToCompletionItems(
   completions.datasourceProviderArguments,
   CompletionItemKind.Property,
-  (label: string) => label.replace('[]', '[$0]').replace('""', '"$0"'),
-)
+  (label: string) => label.replace("[]", "[$0]").replace('""', '"$0"')
+);
 
 export const generatorProviders: CompletionItem[] = convertToCompletionItems(
   completions.generatorProviders,
-  CompletionItemKind.Constant,
-)
+  CompletionItemKind.Constant
+);
 
 export const generatorProviderArguments: CompletionItem[] = convertToCompletionItems(
   completions.generatorProviderArguments,
   CompletionItemKind.Property,
-  (label: string) => label.replace('""', '"$0"'),
-)
+  (label: string) => label.replace('""', '"$0"')
+);
 
 export const generatorPreviewFeatures: CompletionItem[] = convertToCompletionItems(
   completions.generatorPreviewFeatures,
-  CompletionItemKind.Constant,
-)
+  CompletionItemKind.Constant
+);
 
 export const previewFeaturesArguments: CompletionItem[] = convertToCompletionItems(
- completions.previewFeaturesArguments,
+  completions.previewFeaturesArguments,
   CompletionItemKind.Property,
-  (label: string) => label.replace('[]', '[$0]').replace('""', '"$0"'),
-)
+  (label: string) => label.replace("[]", "[$0]").replace('""', '"$0"')
+);
 
 export const datasourcePreviewFeatures: CompletionItem[] = convertToCompletionItems(
   completions.datasourcePreviewFeatures,
   CompletionItemKind.Constant
-)
+);

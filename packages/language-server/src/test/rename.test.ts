@@ -1,60 +1,60 @@
-import { TextDocument } from 'vscode-languageserver-textdocument'
-import { handleRenameRequest } from '../MessageHandler'
-import { WorkspaceEdit, RenameParams, Position } from 'vscode-languageserver'
-import * as assert from 'assert'
-import { getTextDocument } from './helper'
+import { TextDocument } from "vscode-languageserver-textdocument";
+import { handleRenameRequest } from "../MessageHandler";
+import { WorkspaceEdit, RenameParams, Position } from "vscode-languageserver";
+import * as assert from "assert";
+import { getTextDocument } from "./helper";
 
 function assertRename(
   expected: WorkspaceEdit,
   document: TextDocument,
   newName: string,
-  position: Position,
+  position: Position
 ): void {
   const params: RenameParams = {
     textDocument: document,
     newName: newName,
     position: position,
-  }
+  };
 
   const renameResult: WorkspaceEdit | undefined = handleRenameRequest(
     params,
-    document,
-  )
+    document
+  );
 
-  assert.notEqual(renameResult, undefined)
-  assert.deepEqual(renameResult, expected)
+  assert.notEqual(renameResult, undefined);
+  assert.deepEqual(renameResult, expected);
 }
 
-suite('Rename', () => {
-  const renameModelPath = './rename/renameModel.prisma'
-  const renameFieldPath = './rename/renameFields.prisma'
-  const renameEnumPath = './rename/renameEnum.prisma'
-  const renameFieldLargeSchemaPath = './rename/renameFieldLargeSchema.prisma'
+suite("Rename", () => {
+  const renameModelPath = "./rename/renameModel.prisma";
+  const renameFieldPath = "./rename/renameFields.prisma";
+  const renameEnumPath = "./rename/renameEnum.prisma";
+  const renameFieldLargeSchemaPath = "./rename/renameFieldLargeSchema.prisma";
   const renameModelWithJsonDefaultPath =
-    './rename/renameModelWithJsonDefault.prisma'
+    "./rename/renameModelWithJsonDefault.prisma";
 
-  const renameModel: TextDocument = getTextDocument(renameModelPath)
-  const renameField: TextDocument = getTextDocument(renameFieldPath)
-  const renameEnum: TextDocument = getTextDocument(renameEnumPath)
+  const renameModel: TextDocument = getTextDocument(renameModelPath);
+  const renameField: TextDocument = getTextDocument(renameFieldPath);
+  const renameEnum: TextDocument = getTextDocument(renameEnumPath);
   const renameModelWithJsonDefault: TextDocument = getTextDocument(
-    renameModelWithJsonDefaultPath,
-  )
+    renameModelWithJsonDefaultPath
+  );
   const renameFieldLargeSchema: TextDocument = getTextDocument(
-    renameFieldLargeSchemaPath,
-  )
+    renameFieldLargeSchemaPath
+  );
 
-  const newModelName = 'Customer'
-  const newModelName2 = 'Posts'
+  const newModelName = "Customer";
+  const newModelName2 = "Posts";
 
-  const newFieldName = 'publisherId'
-  const newFieldName2 = 'headline'
-  const newFieldName3 = 'humanoidId'
-  const newFieldName4 = 'AlbumFoo'
+  const newFieldName = "publisherId";
+  const newFieldName2 = "headline";
+  const newFieldName3 = "humanoidId";
+  const newFieldName4 = "AlbumFoo";
 
-  const newEnumName = 'Function'
-  const newEnumValue = 'A_VARIANT_WITHOUT_UNDERSCORES'
+  const newEnumName = "Function";
+  const newEnumValue = "A_VARIANT_WITHOUT_UNDERSCORES";
 
-  test('Model', () => {
+  test("Model", () => {
     assertRename(
       {
         changes: {
@@ -85,8 +85,8 @@ suite('Rename', () => {
       },
       renameModel,
       newModelName,
-      { line: 17, character: 10 },
-    )
+      { line: 17, character: 10 }
+    );
     assertRename(
       {
         changes: {
@@ -117,10 +117,10 @@ suite('Rename', () => {
       },
       renameModel,
       newModelName2,
-      { line: 9, character: 10 },
-    )
-  })
-  test('Model where it is used as type', () => {
+      { line: 9, character: 10 }
+    );
+  });
+  test("Model where it is used as type", () => {
     assertRename(
       {
         changes: {
@@ -151,10 +151,10 @@ suite('Rename', () => {
       },
       renameModel,
       newModelName2,
-      { line: 21, character: 12 },
-    )
-  })
-  test('Model with Json default attribute', () => {
+      { line: 21, character: 12 }
+    );
+  });
+  test("Model with Json default attribute", () => {
     assertRename(
       {
         changes: {
@@ -185,10 +185,10 @@ suite('Rename', () => {
       },
       renameModelWithJsonDefault,
       newModelName,
-      { line: 17, character: 10 },
-    )
-  })
-  test('Field not referenced in index block', () => {
+      { line: 17, character: 10 }
+    );
+  });
+  test("Field not referenced in index block", () => {
     assertRename(
       {
         changes: {
@@ -212,10 +212,10 @@ suite('Rename', () => {
       },
       renameFieldLargeSchema,
       newFieldName4,
-      { line: 136, character: 7 },
-    )
-  })
-  test('Field rename on relation field does not add @map', () => {
+      { line: 136, character: 7 }
+    );
+  });
+  test("Field rename on relation field does not add @map", () => {
     assertRename(
       {
         changes: {
@@ -232,10 +232,10 @@ suite('Rename', () => {
       },
       renameFieldLargeSchema,
       newFieldName,
-      { line: 137, character: 7 },
-    )
-  })
-  test('Field referenced in @@id and @relation attributes', () => {
+      { line: 137, character: 7 }
+    );
+  });
+  test("Field referenced in @@id and @relation attributes", () => {
     assertRename(
       {
         changes: {
@@ -273,10 +273,10 @@ suite('Rename', () => {
       },
       renameField,
       newFieldName,
-      { line: 4, character: 12 },
-    )
-  })
-  test('Field referenced in @@index attribute', () => {
+      { line: 4, character: 12 }
+    );
+  });
+  test("Field referenced in @@index attribute", () => {
     assertRename(
       {
         changes: {
@@ -307,10 +307,10 @@ suite('Rename', () => {
       },
       renameField,
       newFieldName2,
-      { line: 17, character: 7 },
-    )
-  })
-  test('Field referenced in @@unique attribute and @relation attribute', () => {
+      { line: 17, character: 7 }
+    );
+  });
+  test("Field referenced in @@unique attribute and @relation attribute", () => {
     assertRename(
       {
         changes: {
@@ -348,10 +348,10 @@ suite('Rename', () => {
       },
       renameField,
       newFieldName3,
-      { line: 25, character: 9 },
-    )
-  })
-  test('Enums', () => {
+      { line: 25, character: 9 }
+    );
+  });
+  test("Enums", () => {
     assertRename(
       {
         changes: {
@@ -382,10 +382,10 @@ suite('Rename', () => {
       },
       renameEnum,
       newEnumName,
-      { line: 5, character: 9 },
-    )
-  })
-  test('Enum Values', () => {
+      { line: 5, character: 9 }
+    );
+  });
+  test("Enum Values", () => {
     assertRename(
       {
         changes: {
@@ -405,7 +405,7 @@ suite('Rename', () => {
               },
             },
             {
-              newText: `@default(${newEnumValue })`,
+              newText: `@default(${newEnumValue})`,
               range: {
                 start: { line: 2, character: 12 },
                 end: { line: 2, character: 48 },
@@ -416,7 +416,7 @@ suite('Rename', () => {
       },
       renameEnum,
       newEnumValue,
-      { line: 8, character: 28 },
-    )
-  })
-})
+      { line: 8, character: 28 }
+    );
+  });
+});

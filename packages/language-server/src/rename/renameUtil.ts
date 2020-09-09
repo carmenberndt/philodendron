@@ -1,92 +1,92 @@
-import { Position } from 'vscode-languageserver'
-import { TextEdit, TextDocument } from 'vscode-languageserver-textdocument'
+import { Position } from "vscode-languageserver";
+import { TextEdit, TextDocument } from "vscode-languageserver-textdocument";
 import {
   getCurrentLine,
   Block,
   getBlockAtPosition,
   getWordAtPosition,
-} from '../MessageHandler'
+} from "../MessageHandler";
 import {
   getTypesFromCurrentBlock,
   getValuesInsideBrackets,
   getAllRelationNames,
-} from '../completion/completions'
+} from "../completion/completions";
 
 function extractFirstWord(line: string): string {
-  return line.replace(/ .*/, '')
+  return line.replace(/ .*/, "");
 }
 
 function getType(currentLine: string): string {
-  const wordsInLine: string[] = currentLine.split(/\s+/)
+  const wordsInLine: string[] = currentLine.split(/\s+/);
   if (wordsInLine.length < 2) {
-    return ''
+    return "";
   }
-  return wordsInLine[1].replace('?', '').replace('[]', '')
+  return wordsInLine[1].replace("?", "").replace("[]", "");
 }
 
 export function extractModelName(line: string): string {
-  const blockType = extractFirstWord(line)
-  return line.slice(blockType.length, line.length - 1).trim()
+  const blockType = extractFirstWord(line);
+  return line.slice(blockType.length, line.length - 1).trim();
 }
 
 export function isRelationField(currentLine: string, lines: string[]): boolean {
-  const relationNames = getAllRelationNames(lines)
-  const type = getType(currentLine)
+  const relationNames = getAllRelationNames(lines);
+  const type = getType(currentLine);
 
-  if (type == '') {
-    return false
+  if (type == "") {
+    return false;
   }
 
-  return relationNames.includes(type)
+  return relationNames.includes(type);
 }
 
 export function isValidFieldName(
   currentLine: string,
   position: Position,
   currentBlock: Block,
-  document: TextDocument,
+  document: TextDocument
 ): boolean {
   if (
-    currentBlock.type !== 'model' ||
+    currentBlock.type !== "model" ||
     position.line == currentBlock.start.line ||
     position.line == currentBlock.end.line
   ) {
-    return false
+    return false;
   }
-  if (currentLine.startsWith('@')) {
-    return false
+  if (currentLine.startsWith("@")) {
+    return false;
   }
 
   // check if position is inside first word
-  const currentLineUntrimmed = getCurrentLine(document, position.line)
-  const firstWord = extractFirstWord(currentLine)
-  const indexOfFirstWord = currentLineUntrimmed.indexOf(firstWord)
+  const currentLineUntrimmed = getCurrentLine(document, position.line);
+  const firstWord = extractFirstWord(currentLine);
+  const indexOfFirstWord = currentLineUntrimmed.indexOf(firstWord);
 
   const isFieldName: boolean =
     indexOfFirstWord <= position.character &&
-    indexOfFirstWord + firstWord.length >= position.character
+    indexOfFirstWord + firstWord.length >= position.character;
 
   if (!isFieldName) {
-    return false
+    return false;
   }
 
   // remove type modifiers
-  const type = getType(currentLine)
-  return type !== '' && type !== undefined
+  const type = getType(currentLine);
+  return type !== "" && type !== undefined;
 }
 
 export function isModelName(
   position: Position,
   block: Block,
   lines: string[],
-  document: TextDocument,
+  document: TextDocument
 ): boolean {
-  if (block.type !== 'model') {
-    return false
+  if (block.type !== "model") {
+    return false;
   }
 
   if (position.line === block.start.line) {
-    return position.character > 5
+    return position.character > 5;
   }
 
   return renameModelOrEnumWhereUsedAsType(
@@ -94,18 +94,18 @@ export function isModelName(
     lines,
     document,
     position,
-    'model',
-  )
+    "model"
+  );
 }
 
 export function isEnumName(
   position: Position,
   block: Block,
   lines: string[],
-  document: TextDocument,
+  document: TextDocument
 ): boolean {
-  if (block.type === 'enum' && position.line === block.start.line) {
-    return position.character > 4
+  if (block.type === "enum" && position.line === block.start.line) {
+    return position.character > 4;
   }
 
   return renameModelOrEnumWhereUsedAsType(
@@ -113,8 +113,8 @@ export function isEnumName(
     lines,
     document,
     position,
-    'enum',
-  )
+    "enum"
+  );
 }
 
 function renameModelOrEnumWhereUsedAsType(
@@ -122,36 +122,36 @@ function renameModelOrEnumWhereUsedAsType(
   lines: string[],
   document: TextDocument,
   position: Position,
-  blockType: string,
+  blockType: string
 ): boolean {
-  if (block.type !== 'model') {
-    return false
+  if (block.type !== "model") {
+    return false;
   }
 
-  const allRelationNames: string[] = getAllRelationNames(lines)
-  const currentName = getWordAtPosition(document, position)
-  const isRelation = allRelationNames.includes(currentName)
+  const allRelationNames: string[] = getAllRelationNames(lines);
+  const currentName = getWordAtPosition(document, position);
+  const isRelation = allRelationNames.includes(currentName);
   if (!isRelation) {
-    return false
+    return false;
   }
   const indexOfRelation = lines.findIndex(
-    (l) => l.startsWith(blockType) && l.includes(currentName),
-  )
-  return indexOfRelation !== -1
+    (l) => l.startsWith(blockType) && l.includes(currentName)
+  );
+  return indexOfRelation !== -1;
 }
 
 export function isEnumValue(
   currentLine: string,
   position: Position,
   currentBlock: Block,
-  document: TextDocument,
+  document: TextDocument
 ): boolean {
   return (
-    currentBlock.type === 'enum' &&
+    currentBlock.type === "enum" &&
     position.line !== currentBlock.start.line &&
-    !currentLine.startsWith('@@') &&
-    !getWordAtPosition(document, position).startsWith('@')
-  )
+    !currentLine.startsWith("@@") &&
+    !getWordAtPosition(document, position).startsWith("@")
+  );
 }
 
 export function printLogMessage(
@@ -160,20 +160,20 @@ export function printLogMessage(
   isEnumRename: boolean,
   isModelRename: boolean,
   isFieldRename: boolean,
-  isEnumValueRename: boolean,
+  isEnumValueRename: boolean
 ): void {
-  const message = `'${currentName}' was renamed to '${newName}'`
-  let typeOfRename = ''
+  const message = `'${currentName}' was renamed to '${newName}'`;
+  let typeOfRename = "";
   if (isEnumRename) {
-    typeOfRename = 'Enum '
+    typeOfRename = "Enum ";
   } else if (isFieldRename) {
-    typeOfRename = 'Field '
+    typeOfRename = "Field ";
   } else if (isModelRename) {
-    typeOfRename = 'Model '
+    typeOfRename = "Model ";
   } else if (isEnumValueRename) {
-    typeOfRename = 'Enum value '
+    typeOfRename = "Enum value ";
   }
-  console.log(typeOfRename + message)
+  console.log(typeOfRename + message);
 }
 
 function insertInlineRename(currentName: string, line: number): TextEdit {
@@ -188,8 +188,8 @@ function insertInlineRename(currentName: string, line: number): TextEdit {
         character: Number.MAX_VALUE,
       },
     },
-    newText: ` @map("${currentName }")`,
-  }
+    newText: ` @map("${currentName}")`,
+  };
 }
 
 function insertMapBlockAttribute(oldName: string, block: Block): TextEdit {
@@ -202,19 +202,19 @@ function insertMapBlockAttribute(oldName: string, block: Block): TextEdit {
       end: block.end,
     },
     newText: `\t@@map("${oldName}")\n}`,
-  }
+  };
 }
 
 function positionIsNotInsideSearchedBlocks(
   line: number,
-  searchedBlocks: Block[],
+  searchedBlocks: Block[]
 ): boolean {
   if (searchedBlocks.length === 0) {
-    return true
+    return true;
   }
   return !searchedBlocks.some(
-    (block) => line >= block.start.line && line <= block.end.line,
-  )
+    (block) => line >= block.start.line && line <= block.end.line
+  );
 }
 
 /**
@@ -228,22 +228,22 @@ export function renameReferencesForFieldValue(
   document: TextDocument,
   lines: string[],
   block: Block,
-  isRelationFieldRename: boolean,
+  isRelationFieldRename: boolean
 ): TextEdit[] {
-  const edits: TextEdit[] = []
-  const searchStringsSameBlock = ['@@index', '@@id', '@@unique']
-  const relationAttribute = '@relation'
+  const edits: TextEdit[] = [];
+  const searchStringsSameBlock = ["@@index", "@@id", "@@unique"];
+  const relationAttribute = "@relation";
   // search in same model first
-  let reachedStartLine = false
+  let reachedStartLine = false;
   for (const [key, item] of lines.entries()) {
     if (key === block.start.line + 1) {
-      reachedStartLine = true
+      reachedStartLine = true;
     }
     if (!reachedStartLine) {
-      continue
+      continue;
     }
     if (key === block.end.line) {
-      break
+      break;
     }
     if (
       item.includes(relationAttribute) &&
@@ -251,17 +251,17 @@ export function renameReferencesForFieldValue(
       !isRelationFieldRename
     ) {
       // search for fields references
-      const currentLineUntrimmed = getCurrentLine(document, key)
-      const indexOfFieldsStart = currentLineUntrimmed.indexOf('fields:')
+      const currentLineUntrimmed = getCurrentLine(document, key);
+      const indexOfFieldsStart = currentLineUntrimmed.indexOf("fields:");
       const indexOfFieldEnd =
-        currentLineUntrimmed.slice(indexOfFieldsStart).indexOf(']') +
-        indexOfFieldsStart
+        currentLineUntrimmed.slice(indexOfFieldsStart).indexOf("]") +
+        indexOfFieldsStart;
       const fields = currentLineUntrimmed.slice(
         indexOfFieldsStart,
-        indexOfFieldEnd + 1,
-      )
-      const indexOfFoundValue = fields.indexOf(currentValue)
-      const fieldValues = getValuesInsideBrackets(fields)
+        indexOfFieldEnd + 1
+      );
+      const indexOfFoundValue = fields.indexOf(currentValue);
+      const fieldValues = getValuesInsideBrackets(fields);
       if (indexOfFoundValue !== -1 && fieldValues.includes(currentValue)) {
         // found a referenced field
         edits.push({
@@ -277,7 +277,7 @@ export function renameReferencesForFieldValue(
             },
           },
           newText: newName,
-        })
+        });
       }
     }
     // search for references in index, id and unique block attributes
@@ -285,10 +285,10 @@ export function renameReferencesForFieldValue(
       searchStringsSameBlock.some((s) => item.includes(s)) &&
       item.includes(currentValue)
     ) {
-      const currentLineUntrimmed = getCurrentLine(document, key)
-      const valuesInsideBracket = getValuesInsideBrackets(currentLineUntrimmed)
+      const currentLineUntrimmed = getCurrentLine(document, key);
+      const valuesInsideBracket = getValuesInsideBrackets(currentLineUntrimmed);
       if (valuesInsideBracket.includes(currentValue)) {
-        const indexOfCurrentValue = currentLineUntrimmed.indexOf(currentValue)
+        const indexOfCurrentValue = currentLineUntrimmed.indexOf(currentValue);
         edits.push({
           range: {
             start: {
@@ -301,7 +301,7 @@ export function renameReferencesForFieldValue(
             },
           },
           newText: newName,
-        })
+        });
       }
     }
   }
@@ -313,18 +313,18 @@ export function renameReferencesForFieldValue(
       value.includes(currentValue) &&
       value.includes(relationAttribute)
     ) {
-      const currentLineUntrimmed = getCurrentLine(document, index)
+      const currentLineUntrimmed = getCurrentLine(document, index);
       // get the index of the second word
-      const indexOfReferences = currentLineUntrimmed.indexOf('references:')
+      const indexOfReferences = currentLineUntrimmed.indexOf("references:");
       const indexOfReferencesEnd =
-        currentLineUntrimmed.slice(indexOfReferences).indexOf(']') +
-        indexOfReferences
+        currentLineUntrimmed.slice(indexOfReferences).indexOf("]") +
+        indexOfReferences;
       const references = currentLineUntrimmed.slice(
         indexOfReferences,
-        indexOfReferencesEnd + 1,
-      )
-      const indexOfFoundValue = references.indexOf(currentValue)
-      const referenceValues = getValuesInsideBrackets(references)
+        indexOfReferencesEnd + 1
+      );
+      const indexOfFoundValue = references.indexOf(currentValue);
+      const referenceValues = getValuesInsideBrackets(references);
       if (indexOfFoundValue !== -1 && referenceValues.includes(currentValue)) {
         edits.push({
           range: {
@@ -339,12 +339,12 @@ export function renameReferencesForFieldValue(
             },
           },
           newText: newName,
-        })
+        });
       }
     }
   }
 
-  return edits
+  return edits;
 }
 
 /**
@@ -355,16 +355,16 @@ export function renameReferencesForEnumValue(
   newName: string,
   document: TextDocument,
   lines: string[],
-  enumName: string,
+  enumName: string
 ): TextEdit[] {
-  const edits: TextEdit[] = []
-  const searchString = `@default(${currentValue})`
+  const edits: TextEdit[] = [];
+  const searchString = `@default(${currentValue})`;
 
   for (const [index, value] of lines.entries()) {
     if (value.includes(searchString) && value.includes(enumName)) {
-      const currentLineUntrimmed = getCurrentLine(document, index)
+      const currentLineUntrimmed = getCurrentLine(document, index);
       // get the index of the second word
-      const indexOfCurrentName = currentLineUntrimmed.indexOf(searchString)
+      const indexOfCurrentName = currentLineUntrimmed.indexOf(searchString);
       edits.push({
         range: {
           start: {
@@ -377,10 +377,10 @@ export function renameReferencesForEnumValue(
           },
         },
         newText: `@default(${newName})`,
-      })
+      });
     }
   }
-  return edits
+  return edits;
 }
 
 /**
@@ -390,10 +390,10 @@ export function renameReferencesForModelName(
   currentName: string,
   newName: string,
   document: TextDocument,
-  lines: string[],
+  lines: string[]
 ): TextEdit[] {
-  const searchedBlocks = []
-  const edits: TextEdit[] = []
+  const searchedBlocks = [];
+  const edits: TextEdit[] = [];
 
   for (const [index, value] of lines.entries()) {
     // check if inside model
@@ -401,31 +401,31 @@ export function renameReferencesForModelName(
       value.includes(currentName) &&
       positionIsNotInsideSearchedBlocks(index, searchedBlocks)
     ) {
-      const block = getBlockAtPosition(index, lines)
-      if (block && block.type == 'model') {
-        searchedBlocks.push(block)
+      const block = getBlockAtPosition(index, lines);
+      if (block && block.type == "model") {
+        searchedBlocks.push(block);
         // search block for references
         const types: Map<string, number> = getTypesFromCurrentBlock(
           lines,
-          block,
-        )
+          block
+        );
         for (const f of types.keys()) {
-          if (f.replace('?', '').replace('[]', '') === currentName) {
+          if (f.replace("?", "").replace("[]", "") === currentName) {
             // replace here
-            const line = types.get(f)
+            const line = types.get(f);
             if (!line) {
-              return edits
+              return edits;
             }
-            const currentLineUntrimmed = getCurrentLine(document, line)
-            const wordsInLine: string[] = lines[line].split(/\s+/)
+            const currentLineUntrimmed = getCurrentLine(document, line);
+            const wordsInLine: string[] = lines[line].split(/\s+/);
             // get the index of the second word
             const indexOfFirstWord = currentLineUntrimmed.indexOf(
-              wordsInLine[0],
-            )
+              wordsInLine[0]
+            );
             const indexOfCurrentName = currentLineUntrimmed.indexOf(
               currentName,
-              indexOfFirstWord + wordsInLine[0].length,
-            )
+              indexOfFirstWord + wordsInLine[0].length
+            );
             edits.push({
               range: {
                 start: {
@@ -438,49 +438,49 @@ export function renameReferencesForModelName(
                 },
               },
               newText: newName,
-            })
+            });
           }
         }
       }
     }
   }
-  return edits
+  return edits;
 }
 
 function mapFieldAttributeExistsAlready(line: string): boolean {
-  return line.includes('@map(')
+  return line.includes("@map(");
 }
 
 function mapBlockAttributeExistsAlready(
   block: Block,
-  lines: string[],
+  lines: string[]
 ): boolean {
-  let reachedStartLine = false
+  let reachedStartLine = false;
   for (const [key, item] of lines.entries()) {
     if (key === block.start.line + 1) {
-      reachedStartLine = true
+      reachedStartLine = true;
     }
     if (!reachedStartLine) {
-      continue
+      continue;
     }
     if (key === block.end.line) {
-      break
+      break;
     }
-    if (item.startsWith('@@map(')) {
-      return true
+    if (item.startsWith("@@map(")) {
+      return true;
     }
   }
-  return false
+  return false;
 }
 
 export function insertBasicRename(
   newName: string,
   currentName: string,
   document: TextDocument,
-  line: number,
+  line: number
 ): TextEdit {
-  const currentLineUntrimmed = getCurrentLine(document, line)
-  const indexOfCurrentName = currentLineUntrimmed.indexOf(currentName)
+  const currentLineUntrimmed = getCurrentLine(document, line);
+  const indexOfCurrentName = currentLineUntrimmed.indexOf(currentName);
 
   return {
     range: {
@@ -494,19 +494,19 @@ export function insertBasicRename(
       },
     },
     newText: newName,
-  }
+  };
 }
 
 export function mapExistsAlready(
   currentLine: string,
   lines: string[],
   block: Block,
-  isModelOrEnumRename: boolean,
+  isModelOrEnumRename: boolean
 ): boolean {
   if (isModelOrEnumRename) {
-    return mapBlockAttributeExistsAlready(block, lines)
+    return mapBlockAttributeExistsAlready(block, lines);
   } else {
-    return mapFieldAttributeExistsAlready(currentLine)
+    return mapFieldAttributeExistsAlready(currentLine);
   }
 }
 
@@ -514,12 +514,12 @@ export function insertMapAttribute(
   currentName: string,
   position: Position,
   block: Block,
-  isModelOrEnumRename: boolean,
+  isModelOrEnumRename: boolean
 ): TextEdit {
   if (isModelOrEnumRename) {
-    return insertMapBlockAttribute(currentName, block)
+    return insertMapBlockAttribute(currentName, block);
   } else {
-    return insertInlineRename(currentName, position.line)
+    return insertInlineRename(currentName, position.line);
   }
 }
 
@@ -529,21 +529,21 @@ export function extractCurrentName(
   isEnumValueRename: boolean,
   isFieldRename: boolean,
   document: TextDocument,
-  position: Position,
+  position: Position
 ): string {
   if (isModelOrEnumRename) {
-    const currentLineUntrimmed = getCurrentLine(document, position.line)
+    const currentLineUntrimmed = getCurrentLine(document, position.line);
     const currentLineTillPosition = currentLineUntrimmed
       .slice(0, position.character)
-      .trim()
-    const wordsBeforePosition: string[] = currentLineTillPosition.split(/\s+/)
+      .trim();
+    const wordsBeforePosition: string[] = currentLineTillPosition.split(/\s+/);
     if (wordsBeforePosition.length < 2) {
-      return ''
+      return "";
     }
-    return wordsBeforePosition[1]
+    return wordsBeforePosition[1];
   }
   if (isEnumValueRename || isFieldRename) {
-    return extractFirstWord(line)
+    return extractFirstWord(line);
   }
-  return ''
+  return "";
 }

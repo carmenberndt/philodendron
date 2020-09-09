@@ -1,16 +1,16 @@
-import path from 'path'
+import path from "path";
 
-import { runTests } from 'vscode-test'
+import { runTests } from "vscode-test";
 
 async function main(): Promise<void> {
   try {
     // The folder containing the Extension Manifest package.json
     // Passed to `--extensionDevelopmentPath`
-    const extensionDevelopmentPath = path.resolve(__dirname, '../../../')
+    const extensionDevelopmentPath = path.resolve(__dirname, "../../../");
 
     // The path to test runner
     // Passed to --extensionTestsPath
-    const extensionTestsPath = path.resolve(__dirname, './index')
+    const extensionTestsPath = path.resolve(__dirname, "./index");
 
     // Download VS Code, unzip it and run the integration test
     await runTests({
@@ -18,13 +18,13 @@ async function main(): Promise<void> {
       extensionTestsPath,
       launchArgs: [
         // This disables all extensions except the one being testing
-        '--disable-extensions',
+        "--disable-extensions",
       ],
-    })
+    });
   } catch (err) {
-    console.error('Failed to run tests')
-    process.exit(1)
+    console.error("Failed to run tests");
+    process.exit(1);
   }
 }
 
-main()
+main();

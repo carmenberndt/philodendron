@@ -1,42 +1,42 @@
-import { TextDocument } from 'vscode-languageserver-textdocument'
-import { handleDiagnosticsRequest } from '../MessageHandler'
-import { getBinPath, binaryIsNeeded } from '../util'
-import install from '../install'
-import { Diagnostic, DiagnosticSeverity } from 'vscode-languageserver'
-import * as assert from 'assert'
-import { getTextDocument } from './helper'
+import { TextDocument } from "vscode-languageserver-textdocument";
+import { handleDiagnosticsRequest } from "../MessageHandler";
+import { getBinPath, binaryIsNeeded } from "../util";
+import install from "../install";
+import { Diagnostic, DiagnosticSeverity } from "vscode-languageserver";
+import * as assert from "assert";
+import { getTextDocument } from "./helper";
 
 async function assertLinting(
   expected: Diagnostic[],
-  fixturePath: string,
+  fixturePath: string
 ): Promise<void> {
-  const document: TextDocument = getTextDocument(fixturePath)
+  const document: TextDocument = getTextDocument(fixturePath);
 
   const diagnosticsResults: Diagnostic[] = await handleDiagnosticsRequest(
-    document,
-  )
+    document
+  );
 
-  assert.ok(diagnosticsResults.length != 0)
+  assert.ok(diagnosticsResults.length != 0);
   expected.forEach((expectedDiagnostic, i) => {
-    const actualDiagnostic = diagnosticsResults[i]
-    assert.equal(actualDiagnostic.message, expectedDiagnostic.message)
-    assert.deepEqual(actualDiagnostic.range, expectedDiagnostic.range)
-    assert.equal(actualDiagnostic.severity, expectedDiagnostic.severity)
-  })
+    const actualDiagnostic = diagnosticsResults[i];
+    assert.equal(actualDiagnostic.message, expectedDiagnostic.message);
+    assert.deepEqual(actualDiagnostic.range, expectedDiagnostic.range);
+    assert.equal(actualDiagnostic.severity, expectedDiagnostic.severity);
+  });
 }
 
-suite('Linting', () => {
+suite("Linting", () => {
   suiteSetup(async () => {
     // install prisma-fmt binary
-    const binPathPrismaFmt = await getBinPath()
-    if (await binaryIsNeeded(binPathPrismaFmt)) await install(binPathPrismaFmt)
-  })
+    const binPathPrismaFmt = await getBinPath();
+    if (await binaryIsNeeded(binPathPrismaFmt)) await install(binPathPrismaFmt);
+  });
 
-  const fixturePathMissingArgument = './linting/missingArgument.prisma'
-  const fixturePathWrongType = './linting/wrongType.prisma'
-  const fixturePathRequiredField = './linting/requiredField.prisma'
+  const fixturePathMissingArgument = "./linting/missingArgument.prisma";
+  const fixturePathWrongType = "./linting/wrongType.prisma";
+  const fixturePathRequiredField = "./linting/requiredField.prisma";
 
-  test('Missing argument', async () => {
+  test("Missing argument", async () => {
     await assertLinting(
       [
         {
@@ -48,10 +48,10 @@ suite('Linting', () => {
           severity: DiagnosticSeverity.Error,
         },
       ],
-      fixturePathMissingArgument,
-    )
-  })
-  test('Wrong type', async () => {
+      fixturePathMissingArgument
+    );
+  });
+  test("Wrong type", async () => {
     await assertLinting(
       [
         {
@@ -64,15 +64,15 @@ suite('Linting', () => {
           severity: DiagnosticSeverity.Error,
         },
       ],
-      fixturePathWrongType,
-    )
-  })
-  test('Required field', async () => {
+      fixturePathWrongType
+    );
+  });
+  test("Required field", async () => {
     await assertLinting(
       [
         {
           message:
-            'Error validating: The relation field `author` uses the scalar fields authorId. At least one of those fields is required. Hence the relation field must be required as well.',
+            "Error validating: The relation field `author` uses the scalar fields authorId. At least one of those fields is required. Hence the relation field must be required as well.",
           range: {
             start: { line: 14, character: 2 },
             end: { line: 15, character: 0 },
@@ -80,7 +80,7 @@ suite('Linting', () => {
           severity: DiagnosticSeverity.Error,
         },
       ],
-      fixturePathRequiredField,
-    )
-  })
-})
+      fixturePathRequiredField
+    );
+  });
+});

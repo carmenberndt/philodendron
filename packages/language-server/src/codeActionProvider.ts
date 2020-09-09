@@ -1,4 +1,4 @@
-import { TextDocument } from 'vscode-languageserver-textdocument'
+import { TextDocument } from "vscode-languageserver-textdocument";
 import {
   CodeActionParams,
   CodeAction,
@@ -6,15 +6,15 @@ import {
   DiagnosticSeverity,
   CodeActionKind,
   Range,
-} from 'vscode-languageserver'
-import { getAllRelationNames } from './completion/completions'
-import { convertDocumentTextToTrimmedLineArray } from './MessageHandler'
-import levenshtein from 'js-levenshtein'
+} from "vscode-languageserver";
+import { getAllRelationNames } from "./completion/completions";
+import { convertDocumentTextToTrimmedLineArray } from "./MessageHandler";
+import levenshtein from "js-levenshtein";
 
 function getInsertRange(document: TextDocument): Range {
   // to insert text into a document create a range where start === end.
-  const start = { line: document.lineCount, character: 0 }
-  return { start, end: start }
+  const start = { line: document.lineCount, character: 0 };
+  return { start, end: start };
 }
 
 /**
@@ -34,13 +34,13 @@ function getInsertRange(document: TextDocument): Range {
  */
 function getSpellingSuggestionForModelAndEnumName(
   name: string,
-  relations: string[],
+  relations: string[]
 ): string | undefined {
-  const maximumLengthDifference = Math.min(2, Math.floor(name.length * 0.34))
-  let bestDistance = Math.floor(name.length * 0.4) + 1 // If the best result isn't better than this, don't bother.
-  let bestCandidate: string | undefined
-  let justCheckExactMatches = false
-  const nameLowerCase = name.toLowerCase()
+  const maximumLengthDifference = Math.min(2, Math.floor(name.length * 0.34));
+  let bestDistance = Math.floor(name.length * 0.4) + 1; // If the best result isn't better than this, don't bother.
+  let bestCandidate: string | undefined;
+  let justCheckExactMatches = false;
+  const nameLowerCase = name.toLowerCase();
   for (const candidate of relations) {
     if (
       !(
@@ -48,88 +48,88 @@ function getSpellingSuggestionForModelAndEnumName(
         maximumLengthDifference
       )
     ) {
-      continue
+      continue;
     }
-    const candidateNameLowerCase = candidate.toLowerCase()
+    const candidateNameLowerCase = candidate.toLowerCase();
     if (candidateNameLowerCase === nameLowerCase) {
-      return candidate
+      return candidate;
     }
     if (justCheckExactMatches) {
-      continue
+      continue;
     }
     if (candidate.length < 3) {
       // Don't bother, user would have noticed a 2-character name having an extra character
-      continue
+      continue;
     }
     // Only care about a result better than the best so far.
-    const distance = levenshtein(nameLowerCase, candidateNameLowerCase)
+    const distance = levenshtein(nameLowerCase, candidateNameLowerCase);
     if (distance > bestDistance) {
-      continue
+      continue;
     }
     if (distance < 3) {
-      justCheckExactMatches = true
-      bestCandidate = candidate
+      justCheckExactMatches = true;
+      bestCandidate = candidate;
     } else {
-      bestDistance = distance
-      bestCandidate = candidate
+      bestDistance = distance;
+      bestCandidate = candidate;
     }
   }
-  return bestCandidate
+  return bestCandidate;
 }
 
 function removeTypeModifiers(
   hasTypeModifierArray: boolean,
   hasTypeModifierOptional: boolean,
-  input: string,
+  input: string
 ): string {
-  if (hasTypeModifierArray) return input.replace('[]', '')
-  if (hasTypeModifierOptional) return input.replace('?', '')
-  return input
+  if (hasTypeModifierArray) return input.replace("[]", "");
+  if (hasTypeModifierOptional) return input.replace("?", "");
+  return input;
 }
 
 function addTypeModifiers(
   hasTypeModifierArray: boolean,
   hasTypeModifierOptional: boolean,
-  suggestion: string,
+  suggestion: string
 ): string {
-  if (hasTypeModifierArray) return `${suggestion}[]`
-  if (hasTypeModifierOptional) return `${suggestion}?`
-  return suggestion
+  if (hasTypeModifierArray) return `${suggestion}[]`;
+  if (hasTypeModifierOptional) return `${suggestion}?`;
+  return suggestion;
 }
 
 export function quickFix(
   textDocument: TextDocument,
-  params: CodeActionParams,
+  params: CodeActionParams
 ): CodeAction[] {
-  const lines: string[] = convertDocumentTextToTrimmedLineArray(textDocument)
-  const diagnostics: Diagnostic[] = params.context.diagnostics
+  const lines: string[] = convertDocumentTextToTrimmedLineArray(textDocument);
+  const diagnostics: Diagnostic[] = params.context.diagnostics;
 
   if (!diagnostics || diagnostics.length === 0) {
-    return []
+    return [];
   }
 
-  const codeActions: CodeAction[] = []
+  const codeActions: CodeAction[] = [];
 
   for (const diag of diagnostics) {
     if (
       diag.severity === DiagnosticSeverity.Error &&
-      diag.message.startsWith('Type') &&
+      diag.message.startsWith("Type") &&
       diag.message.includes(
-        'is neither a built-in type, nor refers to another model, custom type, or enum.',
+        "is neither a built-in type, nor refers to another model, custom type, or enum."
       )
     ) {
-      let diagText = textDocument.getText(diag.range)
-      const hasTypeModifierArray: boolean = diagText.endsWith('[]')
-      const hasTypeModifierOptional: boolean = diagText.endsWith('?')
+      let diagText = textDocument.getText(diag.range);
+      const hasTypeModifierArray: boolean = diagText.endsWith("[]");
+      const hasTypeModifierOptional: boolean = diagText.endsWith("?");
       diagText = removeTypeModifiers(
         hasTypeModifierArray,
         hasTypeModifierOptional,
-        diagText,
-      )
+        diagText
+      );
       const spellingSuggestion = getSpellingSuggestionForModelAndEnumName(
         diagText,
-        getAllRelationNames(lines),
-      )
+        getAllRelationNames(lines)
+      );
       if (spellingSuggestion) {
         codeActions.push({
           title: `Change spelling to '${spellingSuggestion}'`,
@@ -143,13 +143,13 @@ export function quickFix(
                   newText: addTypeModifiers(
                     hasTypeModifierArray,
                     hasTypeModifierOptional,
-                    spellingSuggestion,
+                    spellingSuggestion
                   ),
                 },
               ],
             },
           },
-        })
+        });
       }
       codeActions.push({
         title: `Create new model '${diagText}'`,
@@ -165,7 +165,7 @@ export function quickFix(
             ],
           },
         },
-      })
+      });
       codeActions.push({
         title: `Create new enum '${diagText}'`,
         kind: CodeActionKind.QuickFix,
@@ -180,11 +180,11 @@ export function quickFix(
             ],
           },
         },
-      })
+      });
     }
     if (
       diag.severity === DiagnosticSeverity.Warning &&
-      diag.message.includes('previewFeatures')
+      diag.message.includes("previewFeatures")
     ) {
       codeActions.push({
         title: "Rename property to 'previewFeatures'",
@@ -195,14 +195,14 @@ export function quickFix(
             [params.textDocument.uri]: [
               {
                 range: diag.range,
-                newText: 'previewFeatures',
+                newText: "previewFeatures",
               },
             ],
           },
         },
-      })
+      });
     }
   }
 
-  return codeActions
+  return codeActions;
 }
