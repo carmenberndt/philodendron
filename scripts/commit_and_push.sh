@@ -17,6 +17,8 @@ echo "COMMIT_MESSAGE: $COMMIT_MESSAGE"
 BRANCH=$2
 echo "BRANCH: $BRANCH"
 
+git remote -v
+
 git add -A .
 git commit -am "$COMMIT_MESSAGE"
 git pull --rebase
