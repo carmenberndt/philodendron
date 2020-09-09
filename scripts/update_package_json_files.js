@@ -16,6 +16,7 @@ function bumpLSPVersionInExtension({version}) {
   const vscodePackageJsonPath = path.join(__dirname, '../packages/vscode/package.json')
   let content = getPackageJsonContent({path: vscodePackageJsonPath})
   content['dependencies']['test-philodendron-language-server'] = version
+  console.log(content)
   writeJsonToPackageJson({content: content, path: vscodePackageJsonPath})
 }
 
@@ -87,7 +88,7 @@ if (require.main === module) {
     // only bump LSP version in extension
     console.log("Bumping LSP version in extension.")
     bumpLSPVersionInExtension({
-      nextLSPVersion: args[0]
+      version: args[0]
     })
   } else {
     throw new Error(`Expected 1, 2 or 3 arguments, but received ${args.length}.`)
