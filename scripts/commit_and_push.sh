@@ -22,4 +22,4 @@ git remote -v
 git add -A .
 git commit -am "$COMMIT_MESSAGE"
 git pull --rebase
-git push "$BRANCH"
+git push $BRANCH
