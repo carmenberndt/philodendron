@@ -32,8 +32,8 @@ else
         echo "::set-output name=new_branch::$GITHUB_ARGUMENT"
 
         if [ "$ENVIRONMENT" = "PRODUCTION" ]; then
-            git config --global user.email "carmen@berndt-home.de"
-            git config --global user.name "Bot"
+            git config --global user.email "prismabots@gmail.com"
+            git config --global user.name "Prismo"
 
             if [ "$NPM_CHANNEL" = "latest" ]; then
                 git checkout -b "$BRANCH"
@@ -52,4 +52,3 @@ else
         echo "$BRANCH exists already."
     fi
 fi
-

@@ -1,0 +1,72 @@
+name: Build extension
+
+on:
+  workflow_dispatch:
+    inputs:
+      npm_channel:
+        description: 'Prisma CLI NPM Channel'
+        required: true
+      extension_version:
+        description: 'VSCode extension version'
+        required: true
+      branch:
+        description: 'Branch to run run this workflow on'
+        required: true
+
+env:
+  GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  ENVIRONMENT: ${{ secrets.ENVIRONMENT }}
+
+jobs:
+  build:
+    name: Build extension
+    runs-on: ubuntu-latest
+    steps: 
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.branch }}
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - name: Install Dependencies
+        run: npm install
+      - name: Compile
+        run: npm run compile
+      - name: Replace Readme
+        run: node scripts/change_readme.js ${{ github.event.inputs.npm_channel }}
+      - name: Build vsix 
+        run: cd packages/vscode && npm run package
+      - name: Get tag and asset name
+        id: names
+        run: node scripts/get_tag_name.js ${{ github.event.inputs.npm_channel }} ${{ github.event.inputs.extension_version }}
+      
+      - name: create a release
+        id: create_release
+        uses: actions/create-release@v1
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.names.outputs.tag_name }}
+          release_name: ${{ steps.names.outputs.tag_name }}
+      - name: Get asset name for release asset
+        id: get_asset_name
+        run: | 
+          echo "::set-output name=asset_name::${{ steps.names.outputs.asset_name }}-${{ github.event.inputs.extension_version }}.vsix"
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{github.workspace}}/${{ steps.names.outputs.asset_name }}-${{ github.event.inputs.extension_version }}.vsix
+          asset_name: ${{ steps.get_asset_name.outputs.asset_name }}
+          asset_content_type: application/zip
+      
+      - name: Trigger next workflow to publish extension
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: Publish
+          token: ${{ secrets.GH_TOKEN }}
+          inputs: '{ "asset_name": "${{ steps.get_asset_name.outputs.asset_name }}", "tag_name": "${{ steps.names.outputs.tag_name }}" }'

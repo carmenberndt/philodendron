@@ -1,13 +1,10 @@
-const fs = require('fs')
-const path = require('path')
 const semVer = require('semver')
+const { readVersionFile, writeToVersionFile } = require('./util')
 
-function isMinorRelease({
+function isMinorRelease(
   prismaVersion,
-}) {
+) {
   const tokens = prismaVersion.split('.')
-  console.log(tokens)
-
   if (tokens.length !== 3) {
     throw new Error(
       `Version ${prismaVersion} must have 3 tokens separated by "." character.`
@@ -22,16 +19,20 @@ function currentExtensionVersion({
   switch (branch_channel) {
     case 'master':
     case 'dev':
-      return readFile({ fileName: "extension_insider" })
+      return readVersionFile({ fileName: "extension_insider" })
     case 'latest':
-      return readFile({ fileName: "extension_stable" })
+      return readVersionFile({ fileName: "extension_stable" })
     case 'patch-dev':
-      return readFile({ fileName: "extension_patch" })
+      return readVersionFile({ fileName: "extension_patch" })
     default:
       if (branch_channel.endsWith('.x')) {
-        return readFile({ fileName: "extension_patch" })
+        return readVersionFile({ fileName: "extension_patch" })
       }
   }
+}
+
+function stripPreReleaseText(version) {
+  return version.replace('-dev', '')
 }
 
 function getDerivedExtensionVersion(version) {
@@ -48,22 +49,17 @@ function getDerivedExtensionVersion(version) {
   )
 }
 
-function stripPreReleaseText(version) {
-  return version.replace('-dev', '')
-}
-
 function nextVersion({
   currentVersion,
   branch_channel,
+  prisma_latest,
+  prisma_dev,
+  prisma_patch
 }) {
-  const prisma_latest = readFile({ fileName: 'prisma_latest' })
-  const prisma_dev = stripPreReleaseText(readFile({ fileName: 'prisma_dev' }))
-  const prisma_patch = stripPreReleaseText(readFile({ fileName: 'prisma_patch' }))
-
   const currentVersionTokens = currentVersion.split('.')
-  const prisma_dev_tokens = prisma_dev.split('.')
+  const prisma_dev_tokens = stripPreReleaseText(prisma_dev).split('.')
   const prisma_latest_tokens = prisma_latest.split('.')
-  const prisma_patch_tokens = prisma_patch.split('.')
+  const prisma_patch_tokens = stripPreReleaseText(prisma_patch).split('.')
 
   switch (branch_channel) {
     case 'master':
@@ -84,12 +80,12 @@ function nextVersion({
       return semVer.inc(currentVersion, 'patch')
     case 'latest':
       // Prisma CLI new latest version
-      if (isMinorRelease({prismaVersion: prisma_latest})) {
+      if (isMinorRelease(prisma_latest)) {
         return prisma_latest
       }
       return semVer.inc(currentVersion, 'patch')
     case 'patch-dev':
-      const derivedVersion = getDerivedExtensionVersion(stripPreReleaseText(prisma_patch))
+      const derivedVersion = getDerivedExtensionVersion(prisma_patch)
       if (prisma_patch_tokens[0] !== currentVersion[0]) {
         return derivedVersion
       }
@@ -98,28 +94,14 @@ function nextVersion({
     default:
       if (branch_channel.endsWith('.x')) {
         // extension only new patch update
-        if (prisma_latest_tokens[0] !== currentVersionTokens[0]) {
-          return `${prisma_latest_tokens[0]}.1.1`
+        if (prisma_latest_tokens[1] !== currentVersionTokens[0]) {
+          return `${prisma_latest_tokens[1]}.1.1`
         }
         return semVer.inc(currentVersion, 'patch')
+      } else {
+        throw new Error("This function needs to be called with a known channel (dev, latest or patch-dev) or the current patch branch name ending with '.x'.")
       }
   }
-  throw new Error()
-}
-
-function writeToFile({
-  fileName = '',
-  content
-}) {
-  fs.writeFileSync(path.join(__dirname, 'versions', `./${fileName}`), content)
-}
-
-function readFile({
-  fileName = ''
-}) {
-  return fs.readFileSync(path.join(__dirname, 'versions', `./${fileName}`), {
-    encoding: 'utf-8'
-  }).replace('\n', '')
 }
 
 function bumpExtensionVersionInScriptFiles({
@@ -132,17 +114,17 @@ function bumpExtensionVersionInScriptFiles({
   switch (branch_channel) {
     case 'master':
     case 'dev':
-      writeToFile({fileName: insiderName, content: nextVersion})
+      writeToVersionFile({fileName: insiderName, content: nextVersion})
       break
     case 'latest':
-      writeToFile({fileName: stableName, content: nextVersion})
+      writeToVersionFile({fileName: stableName, content: nextVersion})
       break
     case 'patch-dev':
-      writeToFile({fileName: patchName, content: nextVersion})
+      writeToVersionFile({fileName: patchName, content: nextVersion})
       break
     default:
       if (branch_channel.endsWith('.x')) {
-        writeToFile({fileName: patchName,  content: nextVersion})
+        writeToVersionFile({fileName: patchName,  content: nextVersion})
       }
   }
 }
@@ -159,6 +141,9 @@ if (require.main === module) {
   const version = nextVersion({
     currentVersion,
     branch_channel: args[0],
+    prisma_dev: readVersionFile({ fileName: 'prisma_dev' }),
+    prisma_latest: readVersionFile({ fileName: 'prisma_latest' }),
+    prisma_patch: readVersionFile({ fileName: 'prisma_patch-dev' })
   })
   console.log(`Next extension version ${version}.`)
   console.log(`::set-output name=next_extension_version::${version}`)
