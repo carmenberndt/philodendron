@@ -5,6 +5,8 @@ on:
       branches: 
         - 'master'
         - '**.x'
+      paths-ignore:
+        - '.github/**'
 
 env:
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
