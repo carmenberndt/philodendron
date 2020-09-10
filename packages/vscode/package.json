@@ -2,7 +2,7 @@
   "name": "philodendron-insider",
   "displayName": "Philodendron - Insider",
   "description": "Test Playground",
-  "version": "7.106.1",
+  "version": "7.107.1",
   "license": "Apache-2.0",
   "engines": {
     "vscode": "^1.47.0"
