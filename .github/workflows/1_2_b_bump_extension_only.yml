@@ -23,7 +23,7 @@ jobs:
         run: npm install
       - name: checkout master if necessary
         if: endsWith(github.ref, '/master') == false
-        run: git checkout master
+        run: git fetch && git checkout master
       - name: Setup Git
         run: |
           sh scripts/set_git_credentials.sh
