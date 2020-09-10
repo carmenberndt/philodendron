@@ -12,6 +12,7 @@ else
 fi
 
 NPM_CHANNEL=$1
+echo "hIHihihihih"
 
 if [ "$NPM_CHANNEL" = "dev" ]; then
     echo "Not switching branch because we are on NPM_CHANNEL dev."
