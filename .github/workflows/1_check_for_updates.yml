@@ -1,8 +1,5 @@
 name: Check for Prisma CLI Update
 
-on:
-  schedule:
-    - cron: '*/5 * * * *'
 
 env:
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
