@@ -24,7 +24,7 @@ jobs:
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         id: extract_branch
       - name: Checkout master
-        run: git fetch && checkout master
+        run: git fetch && git checkout master
       - name: Setup Git
         run: |
           sh scripts/set_git_credentials.sh
