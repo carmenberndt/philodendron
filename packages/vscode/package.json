@@ -18,7 +18,7 @@
     "chokidar": "3.4.2",
     "vscode-languageclient": "6.1.3",
     "ovsx": "0.1.0-next.bcce4bc",
-    "test-philodendron-language-server": "7.0.65"
+    "test-philodendron-language-server": "7.0.67"
   },
   "optionalDependencies": {
     "fsevents": "2.1.3"
