@@ -2,7 +2,7 @@
   "name": "philodendron-insider",
   "displayName": "Philodendron - Insider",
   "description": "Test Playground",
-  "version": "7.0.64",
+  "version": "7.0.65",
   "license": "Apache-2.0",
   "engines": {
     "vscode": "^1.47.0"
@@ -17,8 +17,8 @@
     "crypto": "1.0.1",
     "chokidar": "3.4.2",
     "vscode-languageclient": "6.1.3",
-    "test-philodendron-language-server": "7.0.64",
-    "ovsx": "0.1.0-next.bcce4bc"
+    "ovsx": "0.1.0-next.bcce4bc",
+    "test-philodendron-language-server": "7.0.65"
   },
   "optionalDependencies": {
     "fsevents": "2.1.3"

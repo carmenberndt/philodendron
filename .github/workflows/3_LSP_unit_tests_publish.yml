@@ -32,8 +32,6 @@ jobs:
         run: cd packages/language-server && npm install
       - name: Compile LSP
         run: cd packages/language-server && npm run build
-      - name: LSP unit tests
-        run: cd packages/language-server && npm test
 
   bump:
     name: Bump LSP version
