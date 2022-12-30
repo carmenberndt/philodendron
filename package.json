@@ -38,7 +38,7 @@
     "jest": "26.2.2",
     "lerna": "3.22.1",
     "lint-staged": "10.2.11",
-    "mocha": "8.1.0",
+    "mocha": "8.4.0",
     "prettier": "2.0.5",
     "typescript": "3.9.7",
     "vsce": "1.77.0",
